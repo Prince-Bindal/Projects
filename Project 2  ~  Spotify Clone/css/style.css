@@ -367,7 +367,7 @@ body {
         padding: 0;
     }
     .songinfo, .songtime{
-        width: auto;
+        width: 95px;
     }
 
     .left .close {
@@ -384,7 +384,7 @@ body {
     }
 
     .playbar {
-        width: calc(100vw - 60px);
+        width: calc(100vw - 50px);
     }
 
     .seekbar {
@@ -412,7 +412,7 @@ body {
     }
 
     .card {
-        width: 40vw;
+        width: 38vw;
     }
 
     .cardContainer {
@@ -425,8 +425,114 @@ body {
     }
 
     .abovebar {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        align-items:center;
         gap: 8px;
+    }
+
+        
+  
+
+}
+
+/* Updated Volume Styles - Add these to your style.css */
+
+.volume {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.volume > img {
+    cursor: pointer;
+}
+
+/* Hide the range by default */
+.volume .range {
+    display: none;
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 15px 10px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+/* Show the range when active */
+.volume .range.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Vertical slider styling */
+.volume .range input[type="range"] {
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* Webkit */
+    width: 8px;
+    height: 100px;
+    cursor: pointer;
+    accent-color: rgb(61, 155, 105);
+    background: transparent;
+}
+
+/* For Firefox */
+@-moz-document url-prefix() {
+    .volume .range input[type="range"] {
+        width: 100px;
+        height: 8px;
+        transform: rotate(-90deg);
+        transform-origin: center center;
+    }
+    
+    .volume .range {
+        padding: 50px 15px;
+    }
+}
+
+/* Volume Popup - keep existing styles */
+.volume-popup {
+    position: fixed;
+    bottom: 100px;
+    right: 40px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+}
+
+.volume-popup.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Mobile styles - Updated */
+@media (max-width: 1200px) {
+    /* Keep volume visible on mobile */
+    .volume {
+        display: flex;
+    }
+    
+    /* Adjust popup position for mobile */
+    .volume .range {
+        bottom: 60px;
+        right: auto;
+        left: 50%;
+    }
+    
+    .volume-popup {
+        bottom: 120px;
+        right: 20px;
     }
 }

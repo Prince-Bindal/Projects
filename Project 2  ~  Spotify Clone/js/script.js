@@ -266,23 +266,119 @@ async function main() {
     })
 
     // Add an eventListener to volume
-    const volumeSlider = document.querySelector(".range input");
-    const volumePopup = document.getElementById("volumePopup");
+  // Add this code to your script.js - Replace the existing volume event listeners
 
-    volumeSlider.addEventListener("input", (e) => {
-        const volumeValue = parseInt(e.target.value);
-        currentSong.volume = volumeValue / 100;
+// Volume slider functionality
+const volumeSlider = document.querySelector(".range input");
+const volumePopup = document.getElementById("volumePopup");
+const volumeRange = document.querySelector(".volume .range");
+const volumeIcon = document.querySelector(".volume > img");
 
-        // Show popup
-        volumePopup.textContent = `Volume: ${volumeValue}%`;
+let volumeTimeout;
+let hideTimeout;
+
+// Toggle volume slider on icon click
+volumeIcon.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    
+    // Toggle mute/unmute functionality
+    if (e.target.src.includes("/img/volume.svg")) {
+        // Don't mute, just show the slider
+        toggleVolumeSlider();
+    } else if (e.target.src.includes("/img/mute.svg")) {
+        // Unmute
+        e.target.src = e.target.src.replace("/img/mute.svg", "/img/volume.svg");
+        currentSong.volume = 0.50;
+        volumeSlider.value = 50;
+        toggleVolumeSlider();
+    }
+});
+
+// Function to toggle volume slider visibility
+function toggleVolumeSlider() {
+    clearTimeout(hideTimeout);
+    
+    if (volumeRange.classList.contains("show")) {
+        // Hide the slider
+        volumeRange.classList.remove("show");
+    } else {
+        // Show the slider
+        volumeRange.classList.add("show");
+        
+        // Auto-hide after 3 seconds
+        hideTimeout = setTimeout(() => {
+            volumeRange.classList.remove("show");
+        }, 3000);
+    }
+}
+
+// Volume slider input event
+volumeSlider.addEventListener("input", (e) => {
+    const volumeValue = parseInt(e.target.value);
+    currentSong.volume = volumeValue / 100;
+    
+    // Update icon based on volume
+    if (volumeValue === 0) {
+        volumeIcon.src = "/img/mute.svg";
+    } else {
+        volumeIcon.src = "/img/volume.svg";
+    }
+    
+    // Show popup
+    volumePopup.textContent = `Volume: ${volumeValue}%`;
+    volumePopup.classList.add("show");
+    
+    // Hide popup after 1.2 seconds
+    clearTimeout(volumePopup.timeout);
+    volumePopup.timeout = setTimeout(() => {
+        volumePopup.classList.remove("show");
+    }, 1200);
+    
+    // Reset the auto-hide timer for the slider
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+        volumeRange.classList.remove("show");
+    }, 3000);
+});
+
+// Keep slider visible while hovering/interacting
+volumeRange.addEventListener("mouseenter", () => {
+    clearTimeout(hideTimeout);
+});
+
+volumeRange.addEventListener("mouseleave", () => {
+    hideTimeout = setTimeout(() => {
+        volumeRange.classList.remove("show");
+    }, 2000);
+});
+
+// Hide slider when clicking outside
+document.addEventListener("click", (e) => {
+    if (!e.target.closest(".volume")) {
+        volumeRange.classList.remove("show");
+    }
+});
+
+// Optional: Keyboard shortcuts for volume
+document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" && volumeRange.classList.contains("show")) {
+        e.preventDefault();
+        const newVolume = Math.min(100, parseInt(volumeSlider.value) + 5);
+        volumeSlider.value = newVolume;
+        currentSong.volume = newVolume / 100;
+        volumePopup.textContent = `Volume: ${newVolume}%`;
         volumePopup.classList.add("show");
-
-        // Hide after 1.2 seconds
-        clearTimeout(volumePopup.timeout);
-        volumePopup.timeout = setTimeout(() => {
-            volumePopup.classList.remove("show");
-        }, 1200);
-    });
+        setTimeout(() => volumePopup.classList.remove("show"), 1200);
+    } else if (e.key === "ArrowDown" && volumeRange.classList.contains("show")) {
+        e.preventDefault();
+        const newVolume = Math.max(0, parseInt(volumeSlider.value) - 5);
+        volumeSlider.value = newVolume;
+        currentSong.volume = newVolume / 100;
+        volumePopup.textContent = `Volume: ${newVolume}%`;
+        volumePopup.classList.add("show");
+        setTimeout(() => volumePopup.classList.remove("show"), 1200);
+    }
+});
 
     // Optional: Auto-play next song when current ends
     currentSong.addEventListener("ended", () => {
